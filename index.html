@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LensCraft Studio - Nền Tảng Đặt Lịch Nhiếp Ảnh Gia Cao Cấp</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            400: '#F3E5AB',
+                            500: '#D4AF37',
+                            600: '#AA7C11',
+                            700: '#8B6508',
+                        },
+                        darkbg: '#0B0B0E',
+                        darkcard: '#141419',
+                        darkborder: '#26262F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0B0E;
+            color: #E2E8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(20, 20, 25, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .glass-nav {
+            background: rgba(11, 11, 14, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0B0E;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #26262F;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D4AF37;
+        }
+        /* Gold Gradient Text */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF099 0%, #D4AF37 50%, #997300 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #E6C247 0%, #D4AF37 50%, #B88E1F 100%);
+        }
+        .gold-gradient-bg:hover {
+            background: linear-gradient(135deg, #F5D35A 0%, #E6C247 50%, #C99F2E 100%);
+        }
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+        }
+        /* Custom Masonry Column setup */
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 1.25rem;
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1.25rem;
+        }
+        @media (max-width: 1024px) {
+            .masonry-grid { column-count: 2; }
+        }
+        @media (max-width: 640px) {
+            .masonry-grid { column-count: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-gold-500 selection:text-black">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 glass-nav w-full transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="javascript:void(0)" onclick="switchTab('explore')" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-xl gold-gradient-bg flex items-center justify-center text-black font-extrabold text-xl shadow-lg transform group-hover:scale-105 transition-all">
+                    <i class="fa-solid fa-camera-retro"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-bold tracking-wider gold-gradient-text">LENSCRAFT</span>
+                    <span class="text-[10px] tracking-[0.2em] text-gray-400 font-semibold uppercase -mt-1">Studio Premium</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <button id="nav-explore" onclick="switchTab('explore')" class="text-gold-500 font-semibold flex items-center space-x-2 transition-all py-1 border-b-2 border-gold-500">
+                    <i class="fa-solid fa-compass text-sm"></i>
+                    <span>Khám Phá</span>
+                </button>
+                <button id="nav-dashboard" onclick="switchTab('dashboard')" class="text-gray-300 hover:text-gold-500 font-medium flex items-center space-x-2 transition-all py-1 border-b-2 border-transparent">
+                    <i class="fa-solid fa-calendar-check text-sm"></i>
+                    <span>Lịch Chụp Của Tôi</span>
+                    <span id="booking-badge" class="bg-gold-500 text-black text-xs font-bold px-2 py-0.5 rounded-full ml-1 hidden">0</span>
+                </button>
+                <button onclick="openProModal()" class="text-gray-300 hover:text-gold-500 font-medium flex items-center space-x-2 transition-all py-1 border-b-2 border-transparent">
+                    <i class="fa-solid fa-award text-sm text-gold-400"></i>
+                    <span>Trở Thành Nhiếp Ảnh Gia</span>
+                </button>
+            </nav>
+
+            <!-- User Profile / Auth Actions -->
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3 pl-4 border-l border-darkborder">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" alt="Avatar User" class="w-10 h-10 rounded-full object-cover border-2 border-gold-500/50">
+                    <div class="hidden lg:flex flex-col text-left">
+                        <span class="text-sm font-semibold text-white">Minh Anh</span>
+                        <span class="text-xs text-gold-400">Thành viên VIP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINERS -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8">
+
+        <!-- ================= PAGE 1: EXPLORE & SEARCH ================= -->
+        <section id="view-explore" class="space-y-10">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden glass-panel p-10 lg:p-14 border border-gold-500/20 bg-gradient-to-r from-darkcard via-black to-darkcard">
+                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=1600')] bg-cover bg-center opacity-15"></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span>Nền tảng đặt lịch số 1 Việt Nam</span>
+                    </div>
+                    <h1 class="text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+                        Lưu Giữ Khoảnh Khắc <br>
+                        <span class="gold-gradient-text">Cùng Nhiếp Ảnh Gia Đỉnh Cao</span>
+                    </h1>
+                    <p class="text-gray-400 text-base leading-relaxed">
+                        Kết nối trực tiếp với hơn 500+ Nhiếp ảnh gia chuyên nghiệp tại Việt Nam. Tìm kiếm phong cách phù hợp, xem báo giá minh bạch và đặt lịch giữ chỗ chỉ trong 2 phút.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Advanced Filter Bar -->
+            <div class="glass-panel p-6 rounded-2xl shadow-2xl border border-gold-500/20 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Keyword Search -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-magnifying-glass text-gold-500 mr-1"></i> Từ khóa / Tên</label>
+                        <input type="text" id="search-keyword" placeholder="Nhập tên nhiếp ảnh gia..." oninput="filterPhotographers()" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-all">
+                    </div>
+
+                    <!-- City Selection -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-location-dot text-gold-500 mr-1"></i>Địa điểm</label>
+                        <select id="filter-city" onchange="filterPhotographers()" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-all">
+                            <option value="ALL"></option>
+                            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="Đà Nẵng">Đà Nẵng</option>
+                            <option value="Đà Lạt">Đà Lạt</option>
+                            <option value="Hội An">Hội An</option>
+                            <option value="Vũng Tàu">Vũng Tàu</option>
+                            <option value="Quảng Trị">Quảng Trị</option>
+                            <option value="Huế">Huế</option>
+                            <option value="Cần Thơ">Cần Thơ</option>
+                        </select>
+                    </div>
+
+                    <!-- Style / Category -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-camera text-gold-500 mr-1"></i> Phong cách</label>
+                        <select id="filter-category" onchange="filterPhotographers()" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none transition-all">
+                            <option value="ALL">Tất cả phong cách</option>
+                            <option value="Chân dung">Chân dung</option>
+                            <option value="Thời trang">Thời trang </option>
+                            <option value="Sự kiện">Sự kiện</option>
+                            <option value="Sản phẩm">Sản phẩm</option>
+                            <option value="Ảnh cưới">Ảnh cưới</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Filter Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider"><i class="fa-solid fa-tag text-gold-500 mr-1"></i> Mức giá tối đa</label>
+                            <span id="price-value" class="text-xs font-bold text-gold-400">10.000.000 đ</span>
+                        </div>
+                        <input type="range" id="filter-price" min="1000000" max="15000000" step="500000" value="10000000" oninput="updatePriceLabel(this.value); filterPhotographers()" class="w-full accent-gold-500 cursor-pointer h-2 bg-darkbg rounded-lg mt-3">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photographers Grid Section -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-white flex items-center space-x-2">
+                        <span>Danh Sách Nhiếp Ảnh Gia</span>
+                        <span id="results-count" class="text-xs font-normal bg-darkcard text-gold-400 border border-gold-500/30 px-2.5 py-1 rounded-full">6 Nghệ sĩ</span>
+                    </h2>
+                </div>
+
+                <!-- Photographers List Grid -->
+                <div id="photographers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards will be populated dynamically by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: PHOTOGRAPHER DETAIL PROFILE ================= -->
+        <section id="view-profile" class="hidden space-y-10">
+            <!-- Back Button -->
+            <button onclick="switchTab('explore')" class="inline-flex items-center space-x-2 text-gray-400 hover:text-gold-400 transition-all text-sm font-semibold">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Quay lại danh sách</span>
+            </button>
+
+            <!-- Profile Banner Header -->
+            <div id="profile-header" class="relative rounded-3xl overflow-hidden glass-panel border border-gold-500/20">
+                <!-- Cover Image & Information injected dynamically -->
+            </div>
+
+            <!-- Detail Tabs & Content Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content Left (Portfolio & Reviews) -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Bio & Gear Info -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-user-gear text-gold-500"></i>
+                            <span>Giới Thiệu & Thiết Bị Chuyên Dụng</span>
+                        </h3>
+                        <p id="profile-bio" class="text-gray-300 text-sm leading-relaxed"></p>
+                        
+                        <div class="pt-4 border-t border-darkborder grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-xs text-gray-400 font-semibold block mb-1">THIẾT BỊ SỬ DỤNG</span>
+                                <p id="profile-gear" class="text-sm text-gold-400 font-medium"></p>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-400 font-semibold block mb-1">KINH NGHIỆM</span>
+                                <p id="profile-exp" class="text-sm text-white font-semibold"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Gallery (Masonry Layout) -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-images text-gold-500"></i>
+                            <span>Bộ Sưu Tập </span>
+                        </h3>
+                        <div id="profile-portfolio-grid" class="masonry-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Customer Reviews -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-star text-gold-500"></i>
+                                <span>Đánh Giá Từ Khách Hàng</span>
+                            </h3>
+                            <span id="profile-rating-badge" class="bg-gold-500/10 text-gold-400 border border-gold-500/30 px-3 py-1 rounded-full text-xs font-bold"></span>
+                        </div>
+                        <div id="profile-reviews-list" class="space-y-4">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Packages Sidebar Right -->
+                <div class="space-y-6">
+                    <div class="sticky top-28 space-y-6">
+                        <div class="glass-panel p-6 rounded-2xl border-2 border-gold-500/40 space-y-6">
+                            <h3 class="text-xl font-bold text-white flex items-center justify-between">
+                                <span>Bảng Giá Gói Dịch Vụ</span>
+                                <i class="fa-solid fa-tags text-gold-500"></i>
+                            </h3>
+                            <div id="profile-packages-list" class="space-y-4">
+                                <!-- Packages Injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: MY BOOKINGS DASHBOARD ================= -->
+        <section id="view-dashboard" class="hidden space-y-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white">Quản Lý Lịch Chụp Của Tôi</h1>
+                    <p class="text-gray-400 text-sm mt-1">Theo dõi tiến độ, hợp đồng và tình trạng hình ảnh của các buổi chụp</p>
+                </div>
+                <button onclick="switchTab('explore')" class="gold-gradient-bg text-black font-bold px-5 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Đặt Lịch Mới</span>
+                </button>
+            </div>
+
+            <!-- Booking List Filter Tabs -->
+            <div class="flex space-x-4 border-b border-darkborder pb-3">
+                <button class="text-gold-500 font-semibold text-sm px-3 py-1.5 rounded-lg bg-gold-500/10 border border-gold-500/30">Tất Cả Lịch Hẹn</button>
+            </div>
+
+            <!-- Booking List Cards -->
+            <div id="bookings-container" class="space-y-4">
+                <!-- Dynamically Rendered Bookings -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-darkborder bg-black/60 py-8 mt-16 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-md gold-gradient-bg flex items-center justify-center text-black font-extrabold text-xs">L</div>
+                <span class="font-bold text-white">LensCraft Studio Premium © 2026</span>
+            </div>
+            <p class="text-gray-500">Nền tảng kết nối & Đặt lịch Nhiếp ảnh gia chuyên nghiệp hàng đầu Việt Nam</p>
+            <div class="flex space-x-4 text-gray-400">
+                <a href="javascript:void(0)" class="hover:text-gold-400">Điều khoản</a>
+                <a href="javascript:void(0)" class="hover:text-gold-400">Bảo mật</a>
+                <a href="javascript:void(0)" class="hover:text-gold-400">Hỗ trợ 24/7</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= MODAL 1: BOOKING WIZARD ================= -->
+    <div id="booking-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl overflow-hidden border border-gold-500/40 shadow-2xl space-y-6 max-h-[90vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-darkborder flex justify-between items-center bg-darkcard">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-calendar-plus text-gold-500"></i>
+                        <span>Đặt Lịch Chụp Ảnh</span>
+                    </h3>
+                    <p id="modal-photographer-name" class="text-xs text-gold-400 mt-0.5 font-medium"></p>
+                </div>
+                <button onclick="closeBookingModal()" class="w-8 h-8 rounded-full bg-darkbg text-gray-400 hover:text-white flex items-center justify-center border border-darkborder">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form Body -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <!-- Selected Package Overview -->
+                <div class="bg-darkbg p-4 rounded-xl border border-darkborder flex justify-between items-center">
+                    <div>
+                        <span class="text-xs text-gray-400 font-semibold uppercase">Gói chụp đã chọn</span>
+                        <h4 id="modal-package-title" class="text-base font-bold text-gold-400">Gói Tiêu Chuẩn</h4>
+                    </div>
+                    <span id="modal-package-price" class="text-lg font-extrabold text-white">3.500.000 đ</span>
+                </div>
+
+                <form id="booking-form" class="space-y-4">
+                    <!-- Date Picker -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-gray-300"><i class="fa-regular fa-calendar text-gold-500 mr-1"></i> Ngày chụp *</label>
+                            <input type="date" id="booking-date" required class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-gray-300"><i class="fa-regular fa-clock text-gold-500 mr-1"></i> Khung giờ *</label>
+                            <select id="booking-time" required class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none">
+                                <option value="">-- Chọn khung giờ --</option>
+                                <option value="07:00 - 09:00">07:00 - 09:00 (Sáng sớm / Bình minh)</option>
+                                <option value="09:30 - 11:30">09:30 - 11:30 (Sáng)</option>
+                                <option value="14:00 - 16:00">14:00 - 16:00 (Chiều)</option>
+                                <option value="16:30 - 18:30 🔥">16:30 - 18:30 (Khung giờ vàng / Sunset Golden Hour 🔥)</option>
+                                <option value="19:00 - 21:00">19:00 - 21:00 (Đêm / Studio Light)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Location Input -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-300"><i class="fa-solid fa-location-dot text-gold-500 mr-1"></i> Địa điểm mong muốn *</label>
+                        <input type="text" id="booking-location" required placeholder="Nhập địa chỉ Studio, phim trường hoặc ngoại cảnh..." class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none">
+                    </div>
+
+                    <!-- Concept Notes -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-300"><i class="fa-solid fa-pen-to-square text-gold-500 mr-1"></i> Yêu cầu concept & Ghi chú</label>
+                        <textarea id="booking-notes" rows="3" placeholder="Mô tả phong cách mong muốn, số lượng người chụp hoặc yêu cầu trang phục..." class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-3 text-sm focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- Payment Summary Box -->
+                    <div class="p-4 rounded-xl bg-gold-500/5 border border-gold-500/20 space-y-2 text-xs">
+                        <div class="flex justify-between text-gray-300">
+                            <span>Giá gói dịch vụ:</span>
+                            <span id="summary-price" class="font-semibold text-white">0 đ</span>
+                        </div>
+                        <div class="flex justify-between text-gray-300">
+                            <span>Phí dịch vụ LensCraft:</span>
+                            <span class="text-green-400 font-semibold">MIỄN PHÍ</span>
+                        </div>
+                        <div class="pt-2 border-t border-gold-500/20 flex justify-between text-sm font-bold text-white">
+                            <span>Tổng thanh toán:</span>
+                            <span id="summary-total" class="text-gold-400 text-base font-extrabold">0 đ</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 border-t border-darkborder bg-darkcard flex justify-end space-x-3">
+                <button type="button" onclick="closeBookingModal()" class="px-5 py-2.5 rounded-xl border border-darkborder text-gray-400 hover:text-white text-sm font-semibold">Hủy bỏ</button>
+                <button type="button" onclick="confirmBooking()" class="gold-gradient-bg text-black font-extrabold px-6 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Xác Nhận Đặt Lịch</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 2: LIGHTBOX PHOTO VIEW ================= -->
+    <div id="lightbox-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden" onclick="closeLightbox()">
+        <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Full view" class="max-h-[80vh] w-auto object-contain rounded-2xl border border-gold-500/30 shadow-2xl">
+            <p id="lightbox-caption" class="text-gold-400 font-medium text-sm mt-4 text-center"></p>
+            <button onclick="closeLightbox()" class="absolute -top-10 -right-2 text-white hover:text-gold-400 text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= MODAL 3: BECOME PHOTOGRAPHER PRO ================= -->
+    <div id="pro-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl overflow-hidden border border-gold-500/40 p-6 space-y-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-crown text-gold-500"></i>
+                    <span>Đăng Ký Gia Nhập LensCraft Pro</span>
+                </h3>
+                <button onclick="closeProModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-gray-300 leading-relaxed">
+                Trở thành đối tác Nhiếp ảnh gia của LensCraft Studio để tiếp cận hàng nghìn khách hàng doanh nghiệp và cá nhân hàng tháng.
+            </p>
+            <form class="space-y-4" onsubmit="event.preventDefault(); handleProSubmit();">
+                <div>
+                    <label class="text-xs font-semibold text-gray-300">Họ và Tên nghệ sĩ *</label>
+                    <input type="text" required placeholder="Nguyễn Văn A" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-2.5 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300">Link Portfolio / Behance / Instagram *</label>
+                    <input type="url" required placeholder="https://instagram.com/yourportfolio" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-2.5 text-sm mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-300">Số điện thoại liên hệ *</label>
+                    <input type="tel" required placeholder="0901234567" class="w-full bg-darkbg border border-darkborder focus:border-gold-500 text-white rounded-xl px-4 py-2.5 text-sm mt-1">
+                </div>
+                <button type="submit" class="w-full gold-gradient-bg text-black font-extrabold py-3 rounded-xl text-sm mt-2">Gửi Hồ Sơ Xét Duyệt</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= NOTIFICATION TOAST ================= -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-gold-500/50 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300">
+        <div class="w-8 h-8 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+            <h5 id="toast-title" class="text-sm font-bold">Thành công!</h5>
+            <p id="toast-message" class="text-xs text-gray-300">Đã cập nhật dữ liệu.</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* ================= MOCK DATABASE ================= */
+        const photographersData = [
+            {
+                id: 1,
+                name: "Loc Ngo",
+                title: "Master Portrait & Commercial Photographer",
+                badge: "Top Rated",
+                avatar: "https://lh3.googleusercontent.com/XGmiBfrsL08HabfKzOh0p65s01HwnM1KO4P_uMswmIijek6W8aF4aAHHj3FXQoojHS1IR-AKriidt7v7MKgwu8XchoFcTsGx5tvwNQ=w400-h400-l90-c-e30",
+                cover: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=800",
+                city: "TP. Hồ Chí Minh",
+                category: "Chân dung",
+                rating: 4.9,
+                reviewsCount: 84,
+                startingPrice: 3900000,
+                bio: "Với hơn 8 năm kinh nghiệm trong ngành nhiếp ảnh chân dung thương mại và thời trang cao cấp. Tôi tập trung vào thần thái tự nhiên, ánh sáng cinematic sâu lắng và xử lý màu sắc tỉ mỉ theo chuẩn tạp chí.",
+                gear: "Sony A1, Sony A7R V, 85mm f/1.2 GM, 35mm f/1.4 GM, Profoto B10X System",
+                experience: "8+ Năm Kinh Nghiệm Chuyên Nghiệp",
+                portfolio: [
+                    { url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800", caption: "Chân dung Fashion Studio - Tạp chí Elle" },
+                    { url: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800", caption: "Moody Portrait - Ánh sáng tự nhiên" },
+                    { url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=800", caption: "High Fashion Outdoor Concept" },
+                    { url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800", caption: "Beauty Editorial Lighting" },
+                    { url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800", caption: "Executive Portrait Men" }
+                ],
+                packages: [
+                    { id: "pkg-1", name: "Gói Tiêu Chuẩn (Personal Portrait)", price: 3500000, desc: "2 Giờ chụp Studio/Ngoại cảnh, 15 ảnh chỉnh sửa retouch cao cấp, trả toàn bộ file gốc." },
+                    { id: "pkg-2", name: "Gói Cao Cấp (Fashion Lookbook)", price: 6500000, desc: "Half-day (4 Giờ), 30 ảnh retouch chuyên sâu, bao gồm Makeup Artist chuyên nghiệp." },
+                    { id: "pkg-3", name: "Gói VIP Commercial Editorial", price: 12000000, desc: "Full-day photoshoot, ekip riêng, stylist, 50 ảnh master edit chuẩn quảng cáo." }
+                ],
+                reviews: [
+                    { user: "Thùy Trang", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100", rating: 5, date: "15/10/2026", comment: "Anh Vũ chụp cực kỳ tận tâm, bắt góc mặt rất chuẩn. Ảnh trả đúng hạn và màu sắc đẹp hơn mong đợi!" },
+                    { user: "Hoàng Nam", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100", rating: 5, date: "02/10/2026", comment: "Hệ thống đèn studio chuyên nghiệp. Mình chọn gói VIP cho bộ ảnh thương hiệu cá nhân và hoàn toàn hài lòng." }
+                ]
+            },
+            {
+                id: 2,
+                name: "Phạm Viết Phi",
+                title: "Fine Art Wedding & Pre-wedding Specialist",
+                badge: "Được Yêu Thích",
+                avatar: "https://lh3.googleusercontent.com/vFsdtX_o3zuAqiMn9N7lrSl102YnmiZBHyvmzpLVRaHLigLkZWjHrj5FY9qVrdfDRRdB1F2hPj5-NOFrkGA8aJmi2Lt2OiTmzZkFPQ=w400-h400-l90-c-e30",
+                cover: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800",
+                city: "Đà Lạt",
+                category: "Ảnh cưới",
+                rating: 5.0,
+                reviewsCount: 112,
+                startingPrice: 1800000,
+                bio: "Chuyên chụp ảnh cưới Fine Art phong cách lãng mạn, nhẹ nhàng tại Đà Lạt và các tỉnh miền Trung. Tôn vinh cảm xúc tự nhiên thật nhất của các cặp đôi.",
+                gear: "Canon R5, Canon R6 Mark II, RF 50mm f/1.2L, RF 28-70mm f/2L",
+                experience: "10+ Năm Kinh Nghiệm Ảnh Cưới",
+                portfolio: [
+                    { url: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800", caption: "Pre-wedding Đà Lạt Đồi Thông" },
+                    { url: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=800", caption: "Lễ Cưới Sân Vườn Sunset" },
+                    { url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=800", caption: "Khoảnh Khắc Cảm Xúc Cô Dâu" }
+                ],
+                packages: [
+                    { id: "pkg-4", name: "Gói Phim Trường Đà Lạt", price: 8500000, desc: "1 Ngày chụp phim trường & đồi thông, 30 ảnh thiết kế Album cao cấp 30x30." },
+                    { id: "pkg-5", name: "Gói Ngoại Cảnh VIP & Sunset", price: 14500000, desc: "Chụp 2 ngày trọn gói, bao gồm váy cưới cao cấp, makeup và photobook nghệ thuật." }
+                ],
+                reviews: [
+                    { user: "Minh & Hà", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100", rating: 5, date: "18/09/2026", comment: "Anh Đức hướng dẫn dáng rất nhiệt tình, chụp ở Đà Lạt dù sương mù nhưng màu ảnh ra cực kỳ thơ!" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Huy Lee",
+                title: "Fashion & Lookbook Creative Director",
+                badge: "Xu Hướng",
+                avatar: "3CS0BwPHsE7XnrnG0Lqv65BItJFARPpRpnBxWNmpA2wbfh4yZfsXWGD9dlyGwxPDoPXZyTTHydZtWXXYHPUBFMRbyLKpP4YyfRIJnA",
+                cover: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=800",
+                city: "Hà Nội",
+                category: "Thời trang",
+                rating: 4.8,
+                reviewsCount: 65,
+                startingPrice: 1300000,
+                bio: "Nhiếp ảnh gia kiêm Giám đốc sáng tạo cho các Local Brand thời trang nổi tiếng tại Hà Nội. Tư duy màu sắc hiện đại, bắt kịp xu hướng quốc tế.",
+                gear: "Fujifilm GFX 100S (Medium Format), GF 110mm f/2, GF 45mm f/2.8",
+                experience: "6 Năm Kinh Nghiệm",
+                portfolio: [
+                    { url: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=800", caption: "Lookbook Bộ Sưu Tập Thu Đông" },
+                    { url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=800", caption: "Streetwear Fashion Concept" }
+                ],
+                packages: [
+                    { id: "pkg-6", name: "Gói Lookbook Thương Hiệu", price: 4500000, desc: "Chụp 20 bộ trang phục Lookbook trôi nền/ngoại cảnh, trả file đã retouch trong 3 ngày." },
+                    { id: "pkg-7", name: "Gói Creative Editorial", price: 9000000, desc: "Xây dựng concept độc quyền, chụp Moodboard & làm màu sắc cá nhân hóa." }
+                ],
+                reviews: [
+                    { user: "Brand Manager ZARA", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100", rating: 5, date: "20/08/2026", comment: "Elena làm việc cực kỳ chuyên nghiệp, đáp ứng tiến độ gấp của chiến dịch ra mắt SP mới." }
+                ]
+            },
+            {
+                id: 4,
+                name: "Phan Anh Tuấn",
+                title: "Event & Concert High-energy Photographer",
+                badge: "Kinh Nghiệm",
+                avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=300",
+                cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800",
+                city: "Đà Nẵng",
+                category: "Sự kiện",
+                rating: 4.9,
+                reviewsCount: 94,
+                startingPrice: 3000000,
+                bio: "Bắt trọn những khoảnh khắc bùng nổ tại các đại nhạc hội, hội nghị quốc tế và lễ cưới quy mô lớn. Phong cách chụp bắt khoảnh khắc tự nhiên, sắc nét trong điều kiện thiếu sáng.",
+                gear: "Nikon Z9, Nikon Z8, NIKKOR Z 70-200mm f/2.8 VR S, 14-24mm f/2.8",
+                experience: "7+ Năm Kinh Nghiệm Sự Kiện",
+                portfolio: [
+                    { url: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=800", caption: "Đại Nhạc Hội Đà Nẵng Festival" },
+                    { url: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800", caption: "Concert Âm Nhạc Ngoài Trời" }
+                ],
+                packages: [
+                    { id: "pkg-8", name: "Gói Sự Kiện Theo Giờ", price: 3000000, desc: "Chụp sự kiện 2 giờ, lọc và chỉnh sửa cơ bản toàn bộ file ảnh, trả ảnh trong 24h." },
+                    { id: "pkg-9", name: "Gói Sự Kiện Trọn Gói Ngày", price: 8000000, desc: "Chụp trọn gói sự kiện/hội nghị 8 giờ, trả ảnh nhanh làm truyền thông báo chí." }
+                ],
+                reviews: [
+                    { user: "Event Agency Pro", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100", rating: 5, date: "11/10/2026", comment: "Bắt khoảnh khắc sân khấu rất nhạy. Trả file nhanh giúp chúng tôi làm PR ngay trong đêm!" }
+                ]
+            },
+            {
+                id: 5,
+                name: "Lê Hoàng Yến",
+                title: "Commercial & Food Product Photographer",
+                badge: "Sáng Tạo",
+                avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300",
+                cover: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800",
+                city: "TP. Hồ Chí Minh",
+                category: "Sản phẩm",
+                rating: 4.9,
+                reviewsCount: 52,
+                startingPrice: 2500000,
+                bio: "Chuyên chụp ảnh sản phẩm, món ăn nhà hàng và quảng cáo thương mại điện tử. Setup ánh sáng tinh tế giúp nâng tầm giá trị thương hiệu của bạn.",
+                gear: "Sony A7 IV, 90mm f/2.8 Macro G, 24-70mm f/2.8 GM II",
+                experience: "5 Năm Kinh Nghiệm Studio",
+                portfolio: [
+                    { url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800", caption: "Chụp Ẩm Thực Nhà Hàng Cao Cấp" },
+                    { url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&q=80&w=800", caption: "Chụp Mỹ Phẩm & Commercial" }
+                ],
+                packages: [
+                    { id: "pkg-10", name: "Gói Sản Phẩm Studio Basic", price: 2500000, desc: "Chụp 10 sản phẩm trôi nền trắng hoặc Concept đơn giản cho sàn TMĐT." },
+                    { id: "pkg-11", name: "Gói Commercial Luxury Concept", price: 7000000, desc: "Setup Prop decor chuyên nghiệp, ánh sáng nghệ thuật cho nhận diện thương hiệu." }
+                ],
+                reviews: [
+                    { user: "CĐT Nhà Hàng Sài Gòn", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100", rating: 5, date: "05/10/2026", comment: "Hình ảnh món ăn chụp xong nhìn cực kỳ hấp dẫn, đưa lên Menu ai cũng khen!" }
+                ]
+            }
+        ];
+
+        // User Bookings State (Stored in RAM)
+        let myBookings = [
+            {
+                id: "LC-88291",
+                photographerName: "Alexander Vũ",
+                photographerAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300",
+                packageName: "Gói Tiêu Chuẩn (Personal Portrait)",
+                price: 3500000,
+                date: "2026-11-05",
+                time: "16:30 - 18:30 🔥",
+                location: "Studio Minimalist Q.3, TP.HCM",
+                status: "Đã xác nhận",
+                statusClass: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+            },
+            {
+                id: "LC-77310",
+                photographerName: "Trần Minh Đức",
+                photographerAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300",
+                packageName: "Gói Phim Trường Đà Lạt",
+                price: 8500000,
+                date: "2026-10-12",
+                time: "07:00 - 09:00",
+                location: "Đồi thông Cầu Đất, Đà Lạt",
+                status: "Đang chỉnh sửa ảnh",
+                statusClass: "bg-gold-500/10 text-gold-400 border-gold-500/30"
+            }
+        ];
+
+        let selectedPhotographer = null;
+        let selectedPackage = null;
+
+        /* ================= INITIALIZATION ================= */
+        window.onload = function() {
+            renderPhotographers(photographersData);
+            updateBookingBadge();
+            renderBookings();
+        };
+
+        /* ================= NAVIGATION LOGIC ================= */
+        function switchTab(tab) {
+            document.getElementById('view-explore').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.add('hidden');
+
+            document.getElementById('nav-explore').className = "text-gray-300 hover:text-gold-500 font-medium flex items-center space-x-2 transition-all py-1 border-b-2 border-transparent";
+            document.getElementById('nav-dashboard').className = "text-gray-300 hover:text-gold-500 font-medium flex items-center space-x-2 transition-all py-1 border-b-2 border-transparent";
+
+            if (tab === 'explore') {
+                document.getElementById('view-explore').classList.remove('hidden');
+                document.getElementById('nav-explore').className = "text-gold-500 font-semibold flex items-center space-x-2 transition-all py-1 border-b-2 border-gold-500";
+            } else if (tab === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('nav-dashboard').className = "text-gold-500 font-semibold flex items-center space-x-2 transition-all py-1 border-b-2 border-gold-500";
+                renderBookings();
+            } else if (tab === 'profile') {
+                document.getElementById('view-profile').classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ================= EXPLORE & FILTER LOGIC ================= */
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function updatePriceLabel(val) {
+            document.getElementById('price-value').innerText = formatMoney(val);
+        }
+
+        function renderPhotographers(list) {
+            const grid = document.getElementById('photographers-grid');
+            document.getElementById('results-count').innerText = `${list.length} Nghệ sĩ`;
+
+            if (list.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 glass-panel rounded-2xl">
+                        <i class="fa-solid fa-camera-slash text-4xl text-gray-500 mb-3"></i>
+                        <p class="text-gray-300 font-semibold">Không tìm thấy nhiếp ảnh gia phù hợp</p>
+                        <p class="text-xs text-gray-500 mt-1">Thử thay đổi bộ lọc tìm kiếm hoặc từ khóa của bạn.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = list.map(item => `
+                <div class="glass-panel rounded-2xl overflow-hidden border border-gold-500/15 hover:border-gold-500/40 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <!-- Cover Image -->
+                        <div class="relative h-44 overflow-hidden">
+                            <img src="${item.cover}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-darkcard via-transparent to-black/30"></div>
+                            <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-gold-400 border border-gold-500/30 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                                ${item.badge}
+                            </span>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-5 relative -mt-8 space-y-3">
+                            <div class="flex items-end justify-between">
+                                <img src="${item.avatar}" alt="${item.name}" class="w-16 h-16 rounded-2xl object-cover border-2 border-gold-500 shadow-xl bg-darkcard">
+                                <div class="flex items-center space-x-1 text-gold-400 text-xs font-bold bg-darkbg/80 px-2.5 py-1 rounded-lg border border-darkborder">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span>${item.rating}</span>
+                                    <span class="text-gray-400 font-normal">(${item.reviewsCount})</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-bold text-white group-hover:text-gold-400 transition-colors">${item.name}</h3>
+                                <p class="text-xs text-gray-400 truncate">${item.title}</p>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-2 text-[11px]">
+                                <span class="bg-darkbg text-gray-300 px-2.5 py-1 rounded-md border border-darkborder">
+                                    <i class="fa-solid fa-location-dot text-gold-500 mr-1"></i>${item.city}
+                                </span>
+                                <span class="bg-darkbg text-gray-300 px-2.5 py-1 rounded-md border border-darkborder">
+                                    <i class="fa-solid fa-camera text-gold-500 mr-1"></i>${item.category}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="p-5 pt-0 border-t border-darkborder/50 mt-2 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider block">Giá khởi điểm</span>
+                            <span class="text-sm font-extrabold text-gold-400">${formatMoney(item.startingPrice)}</span>
+                        </div>
+                        <button onclick="openProfile(${item.id})" class="gold-gradient-bg text-black font-bold px-4 py-2 rounded-xl text-xs flex items-center space-x-1 shadow-md hover:brightness-110 transition-all">
+                            <span>Xem Hồ Sơ</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPhotographers() {
+            const keyword = document.getElementById('search-keyword').value.toLowerCase().trim();
+            const city = document.getElementById('filter-city').value;
+            const category = document.getElementById('filter-category').value;
+            const maxPrice = parseInt(document.getElementById('filter-price').value);
+
+            const filtered = photographersData.filter(p => {
+                const matchKeyword = p.name.toLowerCase().includes(keyword) || p.title.toLowerCase().includes(keyword);
+                const matchCity = (city === 'ALL' || p.city === city);
+                const matchCategory = (category === 'ALL' || p.category === category);
+                const matchPrice = p.startingPrice <= maxPrice;
+
+                return matchKeyword && matchCity && matchCategory && matchPrice;
+            });
+
+            renderPhotographers(filtered);
+        }
+
+        /* ================= PROFILE VIEW LOGIC ================= */
+        function openProfile(id) {
+            selectedPhotographer = photographersData.find(p => p.id === id);
+            if (!selectedPhotographer) return;
+
+            // Render Header
+            const header = document.getElementById('profile-header');
+            header.innerHTML = `
+                <div class="h-64 relative bg-cover bg-center" style="background-image: url('${selectedPhotographer.cover}')">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkcard via-darkcard/50 to-transparent"></div>
+                </div>
+                <div class="p-8 relative -mt-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div class="flex flex-col md:flex-row items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 text-center md:text-left">
+                        <img src="${selectedPhotographer.avatar}" class="w-28 h-28 rounded-3xl object-cover border-4 border-gold-500 shadow-2xl bg-darkcard">
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-center md:justify-start space-x-2">
+                                <h1 class="text-3xl font-extrabold text-white">${selectedPhotographer.name}</h1>
+                                <i class="fa-solid fa-circle-check text-gold-400 text-lg" title="Xác thực chuyên nghiệp"></i>
+                            </div>
+                            <p class="text-sm text-gold-400 font-semibold">${selectedPhotographer.title}</p>
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs text-gray-300 pt-1">
+                                <span><i class="fa-solid fa-location-dot text-gold-500 mr-1"></i>${selectedPhotographer.city}</span>
+                                <span><i class="fa-solid fa-star text-gold-500 mr-1"></i>${selectedPhotographer.rating} (${selectedPhotographer.reviewsCount} Đánh giá)</span>
+                                <span class="bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-md font-semibold">${selectedPhotographer.badge}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Bio & Gear
+            document.getElementById('profile-bio').innerText = selectedPhotographer.bio;
+            document.getElementById('profile-gear').innerText = selectedPhotographer.gear;
+            document.getElementById('profile-exp').innerText = selectedPhotographer.experience;
+
+            // Portfolio Grid
+            const portfolioGrid = document.getElementById('profile-portfolio-grid');
+            portfolioGrid.innerHTML = selectedPhotographer.portfolio.map(img => `
+                <div class="masonry-item group relative rounded-2xl overflow-hidden cursor-pointer border border-darkborder hover:border-gold-500/50 transition-all" onclick="openLightbox('${img.url}', '${img.caption}')">
+                    <img src="${img.url}" class="w-full object-cover group-hover:scale-105 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all p-4 flex items-end">
+                        <span class="text-xs font-semibold text-gold-400"><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> ${img.caption}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Reviews
+            document.getElementById('profile-rating-badge').innerText = `⭐ ${selectedPhotographer.rating} / 5.0`;
+            const reviewsList = document.getElementById('profile-reviews-list');
+            reviewsList.innerHTML = selectedPhotographer.reviews.map(r => `
+                <div class="p-4 rounded-xl bg-darkbg border border-darkborder space-y-2">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <img src="${r.avatar}" class="w-8 h-8 rounded-full object-cover border border-gold-500/40">
+                            <span class="text-sm font-bold text-white">${r.user}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">${r.date}</span>
+                    </div>
+                    <div class="text-xs text-gold-400">
+                        ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}
+                    </div>
+                    <p class="text-xs text-gray-300 leading-relaxed">${r.comment}</p>
+                </div>
+            `).join('');
+
+            // Packages List
+            const packagesList = document.getElementById('profile-packages-list');
+            packagesList.innerHTML = selectedPhotographer.packages.map(pkg => `
+                <div class="p-4 rounded-xl bg-darkbg border border-darkborder hover:border-gold-500 transition-all space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-sm font-bold text-white">${pkg.name}</h4>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">${pkg.desc}</p>
+                    <div class="flex justify-between items-center pt-2 border-t border-darkborder/60">
+                        <span class="text-base font-extrabold text-gold-400">${formatMoney(pkg.price)}</span>
+                        <button onclick="openBookingModal('${pkg.id}')" class="gold-gradient-bg text-black font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center space-x-1 shadow-md">
+                            <i class="fa-solid fa-calendar-check text-[10px]"></i>
+                            <span>Chọn Gói</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            switchTab('profile');
+        }
+
+        /* ================= LIGHTBOX LOGIC ================= */
+        function openLightbox(url, caption) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-caption').innerText = caption;
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+        }
+
+        /* ================= BOOKING MODAL LOGIC ================= */
+        function openBookingModal(packageId) {
+            if (!selectedPhotographer) return;
+            selectedPackage = selectedPhotographer.packages.find(p => p.id === packageId);
+            if (!selectedPackage) return;
+
+            document.getElementById('modal-photographer-name').innerText = `Nhiếp ảnh gia: ${selectedPhotographer.name}`;
+            document.getElementById('modal-package-title').innerText = selectedPackage.name;
+            document.getElementById('modal-package-price').innerText = formatMoney(selectedPackage.price);
+            
+            document.getElementById('summary-price').innerText = formatMoney(selectedPackage.price);
+            document.getElementById('summary-total').innerText = formatMoney(selectedPackage.price);
+
+            // Set min date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('booking-date').min = today;
+
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function confirmBooking() {
+            const date = document.getElementById('booking-date').value;
+            const time = document.getElementById('booking-time').value;
+            const location = document.getElementById('booking-location').value;
+
+            if (!date || !time || !location) {
+                showToast("Cảnh báo", "Vui lòng điền đầy đủ Ngày, Khung giờ và Địa điểm!", "warning");
+                return;
+            }
+
+            const newBooking = {
+                id: `LC-${Math.floor(10000 + Math.random() * 90000)}`,
+                photographerName: selectedPhotographer.name,
+                photographerAvatar: selectedPhotographer.avatar,
+                packageName: selectedPackage.name,
+                price: selectedPackage.price,
+                date: date,
+                time: time,
+                location: location,
+                status: "Đã xác nhận",
+                statusClass: "bg-blue-500/10 text-blue-400 border-blue-500/30"
+            };
+
+            myBookings.unshift(newBooking);
+            updateBookingBadge();
+            closeBookingModal();
+            showToast("Đặt Lịch Thành Công!", `Lịch hẹn mã ${newBooking.id} đã được khởi tạo.`);
+            
+            setTimeout(() => {
+                switchTab('dashboard');
+            }, 600);
+        }
+
+        /* ================= DASHBOARD BOOKINGS LOGIC ================= */
+        function updateBookingBadge() {
+            const badge = document.getElementById('booking-badge');
+            if (myBookings.length > 0) {
+                badge.innerText = myBookings.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderBookings() {
+            const container = document.getElementById('bookings-container');
+            if (myBookings.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 glass-panel rounded-2xl">
+                        <i class="fa-solid fa-calendar-xmark text-4xl text-gray-500 mb-3"></i>
+                        <p class="text-gray-300 font-semibold">Bạn chưa có lịch chụp nào</p>
+                        <p class="text-xs text-gray-500 mt-1">Khám phá danh sách nghệ sĩ và đặt lịch ngay hôm nay!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myBookings.map(b => `
+                <div class="glass-panel p-6 rounded-2xl border border-gold-500/20 space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-darkborder pb-4">
+                        <div class="flex items-center space-x-4">
+                            <img src="${b.photographerAvatar}" class="w-12 h-12 rounded-xl object-cover border border-gold-500">
+                            <div>
+                                <span class="text-[11px] text-gold-400 font-bold uppercase tracking-wider">Mã lịch: ${b.id}</span>
+                                <h3 class="text-lg font-bold text-white">${b.photographerName}</h3>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border ${b.statusClass}">${b.status}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <span class="text-gray-400 font-semibold block">GÓI DỊCH VỤ</span>
+                            <span class="text-white font-medium">${b.packageName}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 font-semibold block">THỜI GIAN CHỤP</span>
+                            <span class="text-gold-400 font-medium"><i class="fa-regular fa-calendar mr-1"></i>${b.date} (${b.time})</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 font-semibold block">ĐỊA ĐIỂM</span>
+                            <span class="text-white font-medium truncate block"><i class="fa-solid fa-location-dot mr-1 text-gold-500"></i>${b.location}</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 flex justify-between items-center border-t border-darkborder/50 text-xs">
+                        <span class="text-gray-400">Tổng chi phí: <strong class="text-gold-400 text-sm font-bold ml-1">${formatMoney(b.price)}</strong></span>
+                        <div class="flex space-x-2">
+                            <button onclick="cancelBooking('${b.id}')" class="px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 font-semibold transition-all">
+                                Hủy Lịch
+                            </button>
+                            <button onclick="showToast('Thông báo', 'Hợp đồng mã ${b.id} đã được gửi vào Email của bạn.')" class="px-3 py-1.5 rounded-lg bg-darkbg border border-darkborder text-gray-300 hover:text-white font-semibold transition-all">
+                                Xem Hợp Đồng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function cancelBooking(id) {
+            myBookings = myBookings.filter(b => b.id !== id);
+            updateBookingBadge();
+            renderBookings();
+            showToast("Đã Hủy Lịch", `Lịch chụp ${id} đã được hủy thành công.`);
+        }
+
+        /* ================= PRO REGISTRATION MODAL ================= */
+        function openProModal() {
+            document.getElementById('pro-modal').classList.remove('hidden');
+        }
+        function closeProModal() {
+            document.getElementById('pro-modal').classList.add('hidden');
+        }
+        function handleProSubmit() {
+            closeProModal();
+            showToast("Gửi Hồ Sơ Thành Công", "Đội ngũ LensCraft Studio sẽ liên hệ với bạn trong vòng 24h làm việc!");
+        }
+
+        /* ================= TOAST NOTIFICATION SYSTEM ================= */
+        function showToast(title, message, type = "success") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
