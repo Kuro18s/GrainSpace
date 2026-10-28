@@ -14,7 +14,7 @@ def fold(s):
     return re.sub(r"[^a-z0-9 ]+", " ", s)
 
 def space_text(s):
-    return " ".join([s["name"], s["type"], s["district"], s["style"], " ".join(s["equipment"]), s["desc"]])
+    return " ".join([s["name"], s["type"], s["district"], s["city"], s["style"], " ".join(s["equipment"]), s["desc"]])
 
 class Embedder:
     """Mặc định: TF-IDF char n-gram. Muốn dùng embedding thật, kế thừa class này
@@ -46,11 +46,12 @@ class AIService:
         return [(self.spaces[i]["id"], round(float(sc[i]), 3)) for i in idx]
 
     # 2) Recommendation content-based + luật lọc cứng
-    def recommend(self, need, budget=None, space_type=None, district=None, people=None, k=3):
+    def recommend(self, need, budget=None, space_type=None, district=None, people=None, k=3, city=None):
         sim = self.sp.sim(need)
         out = []
         for i, s in enumerate(self.spaces):
             if space_type and s["type"] != space_type: continue
+            if city and s["city"] != city: continue
             if people and s["cap"] < people: continue
             if budget and s["price"] > budget: continue
             score = sim[i]  # độ tương đồng nội dung
@@ -75,6 +76,26 @@ class AIService:
         if llm:  # chỗ cắm LLM (ví dụ OpenAI API): chỉ cho phép trả lời dựa trên đoạn `a`
             a = llm(message, a)
         return dict(answer=a, source=q, score=round(float(sc[i]), 3))
+
+    # 4) Trợ lý FilmLab AI: tự chọn trả lời bằng kho kiến thức hay gợi ý không gian
+    QUESTION_WORDS = {"gi", "nao", "sao", "cach", "khac", "nen", "bao"}   # dạng câu hỏi kiến thức
+    PRICE_WORDS = {"re", "gia", "tiet", "kiem"}                            # ưu tiên giá thấp
+
+    def assistant(self, message, kb_threshold=0.32, space_threshold=0.30):
+        kbs, sps = self.kb.sim(message), self.sp.sim(message)
+        i, j = int(np.argmax(kbs)), int(np.argmax(sps))
+        toks = set(fold(message).split())
+        def knowledge():
+            return dict(kind="knowledge", answer=KB[i][1], source=KB[i][0], score=round(float(kbs[i]), 3))
+        if toks & self.QUESTION_WORDS and kbs[i] >= kb_threshold: return knowledge()
+        if sps[j] >= space_threshold:
+            order = [int(x) for x in np.argsort(-sps)[:5]]
+            if toks & self.PRICE_WORDS: order = sorted(order, key=lambda x: self.spaces[x]["price"])
+            s = self.spaces[order[0]]
+            ans = f"Mình gợi ý {s['name']} ({s['type']}, {s['district']}, {s['city']}), giá {s['price']:,}đ/giờ. {s['desc']}"
+            return dict(kind="space", answer=ans, space_id=s["id"], score=round(float(sps[j]), 3))
+        if kbs[i] >= kb_threshold: return knowledge()
+        return dict(kind="unknown", answer="Mình chưa có thông tin phù hợp. Bạn thử mô tả loại phòng, khu vực hoặc ngân sách nhé.", score=round(float(max(kbs[i], sps[j])), 3))
 
 if __name__ == "__main__":
     ai = AIService()

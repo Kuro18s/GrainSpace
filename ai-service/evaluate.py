@@ -14,6 +14,7 @@ SEARCH_Q = [
  ("phong cách thập niên 90 vintage",{8,4}),("thử nghiệm kỹ thuật in sáng tạo",{12}),
  ("phòng tối giá rẻ cho người mới học",{18,9,3}),("tráng phim đen trắng và in phóng có nhân viên hỗ trợ",{5}),
  ("in thủ công giấy baryta cổ điển",{7}),("workshop nhiếp ảnh phim",{9,5}),
+ ("phòng tối ở Hà Nội có dịch vụ scan film",{23}),("studio chân dung ở Quận 1",{22,2}),("phòng tối đánh giá cao ở Quận 3",{21}),
  ("phong toi gia re cho nguoi moi hoc",{18,9,3}),("quet phim am ban",{10,20}),
 ]
 CHAT_Q = [
@@ -45,12 +46,12 @@ def chat_top1(model):
 if __name__ == "__main__":
     ai = AIService()
     kw = KeywordBaseline([__import__("ai_service").space_text(s) for s in SPACES])
-    print("== Search phòng (22 truy vấn) ==")
+    print(f"== Search phòng ({len(SEARCH_Q)} truy vấn) ==")
     for name, m in [("Keyword baseline", kw), ("TF-IDF char n-gram + bỏ dấu", ai.sp)]:
         r, mrr = metrics(m); print(f"{name:32s} Recall@3={r:.2f}  MRR={mrr:.2f}")
     from data import KB
     kwkb = KeywordBaseline([q+" "+a for q,a in KB])
-    print("== Chatbot KB (29 câu hỏi) top-1 accuracy ==")
+    print(f"== Chatbot KB ({len(CHAT_Q)} câu hỏi) top-1 accuracy ==")
     print(f"Keyword baseline                 {chat_top1(kwkb):.2f}")
     print(f"TF-IDF char n-gram + bỏ dấu      {chat_top1(ai.kb):.2f}")
     print("== Ngưỡng 'không biết' ==")
