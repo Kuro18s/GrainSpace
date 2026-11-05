@@ -1,0 +1,27 @@
+:root { --bg:#fff; --fg:#1a1a1a; --muted:#6b6b6b; --line:#e2e2e2; --card:#f7f7f7; --accent:#1f6f8b; --danger:#b3261e; --ok:#1b7f3b; }
+@media (prefers-color-scheme: dark) { :root { --bg:#14171a; --fg:#ececec; --muted:#9aa0a6; --line:#2d3237; --card:#1d2125; --accent:#5fb4d1; --danger:#f2b8b5; --ok:#7ad99a; } }
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, "Segoe UI", Arial, sans-serif; background:var(--bg); color:var(--fg); }
+.layout { display:flex; min-height:100vh; }
+.side { width:220px; padding:20px 14px; border-right:1px solid var(--line); background:var(--card); }
+.side h1 { font-size:18px; margin:0 0 18px; }
+.side a { display:block; padding:8px 10px; border-radius:6px; color:var(--fg); text-decoration:none; }
+.side a.active { background:var(--accent); color:#fff; }
+.main { flex:1; padding:24px; max-width:1100px; overflow-x:auto; }
+h2 { margin-top:0; }
+table { border-collapse:collapse; width:100%; } th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { color:var(--muted); font-weight:600; font-size:13px; }
+button { padding:6px 12px; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:6px; cursor:pointer; }
+button.primary { background:var(--accent); color:#fff; border-color:var(--accent); } button.danger { color:var(--danger); }
+button:disabled { opacity:.5; cursor:default; }
+input, select, textarea { padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); font:inherit; width:100%; }
+label { display:block; font-size:13px; color:var(--muted); margin-bottom:10px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; }
+.stat { font-size:28px; font-weight:700; }
+.err { color:var(--danger); margin:8px 0; } .muted { color:var(--muted); }
+.badge { padding:2px 8px; border-radius:10px; font-size:12px; background:var(--line); }
+.badge.confirmed,.badge.available { color:var(--ok); } .badge.rejected,.badge.cancelled,.badge.maintenance { color:var(--danger); }
+.row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
+.login { max-width:360px; margin:12vh auto; padding:24px; }
+@media (max-width:720px) { .layout { flex-direction:column; } .side { width:auto; display:flex; gap:6px; flex-wrap:wrap; align-items:center; } .side h1 { margin:0 10px 0 0; } }
