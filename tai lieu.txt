@@ -1,0 +1,47 @@
+GrainSpace/
+├── ai-service/                
+│   ├── ai_service.py
+│   ├── api.py
+│   ├── data.py
+│   ├── evaluate.py
+│   ├── test_ai.py
+│   ├── requirements.txt
+│   └── README.md
+│
+├── web-portal/                   
+│   ├── src/
+│   │   ├── pages/               
+│   │   ├── App.tsx
+│   │   ├── api.ts
+│   │   ├── auth.tsx
+│   │   ├── main.tsx
+│   │   ├── styles.css
+│   │   ├── types.ts
+│   │   └── vite-env.d.ts
+│   ├── index.html
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   ├── .env.example
+│   └── README.md
+│
+├── devops/                       
+│   ├── ai.Dockerfile
+│   ├── backend.Dockerfile
+│   ├── web.Dockerfile
+│   ├── docker-compose.yml
+│   ├── e2e_smoke.py
+│   └── .env.example
+│
+├── docs/                      
+│   ├── BUG_REPORT_TEMPLATE.md
+│   ├── HUONG_DAN_CHAY.md
+│   ├── TEST_CHECKLIST.md
+│   ├── TEST_PLAN.md
+│   └── WIREFRAMES.md
+│
+├── .github/                      
+│   └── workflows/
+│       └── ci.yml
+│
+└── README.md                     
