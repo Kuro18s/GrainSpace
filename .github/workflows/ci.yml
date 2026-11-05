@@ -1,0 +1,62 @@
+name: CI
+on:
+  push: { branches: [main, develop] }
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: backend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: backend/requirements.txt }
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+
+  ai:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: ai_service } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: ai_service/requirements.txt }
+      - run: pip install -r requirements.txt
+      - run: python test_ai.py
+
+  web:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npm run build
+
+  mobile:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: mobile } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable }
+      - run: flutter create --platforms=android .
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  integration:
+    needs: [backend, ai]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r backend/requirements.txt -r ai_service/requirements.txt
+      - name: Chạy AI service và backend, rồi smoke test
+        run: |
+          (cd ai_service && nohup uvicorn api:app --port 8001 > ../ai.log 2>&1 &)
+          (cd backend && python seed.py && AI_SERVICE_URL=http://localhost:8001 nohup uvicorn main:app --port 8000 > ../be.log 2>&1 &)
+          sleep 8
+          python devops/e2e_smoke.py http://localhost:8000
