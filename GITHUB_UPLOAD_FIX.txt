@@ -1,0 +1,28 @@
+HƯỚNG DẪN ĐƯA BẢN ZIP MỚI LÊN GITHUB
+
+Quan trọng: Bản ZIP mới đã thay 7 ảnh Git LFS bị thiếu bằng PNG placeholder và bỏ các quy tắc LFS. Nếu thư mục GrainSpace local đã có commit cũ chứa con trỏ LFS, cần thay nội dung và cập nhật lại commit trước khi Push.
+
+CÁCH KHUYẾN NGHỊ (giữ repository đã clone):
+1. Đóng GitHub Desktop.
+2. Mở C:\GitHub\GrainSpace trong File Explorer.
+3. Giải nén ZIP mới vào một thư mục tạm.
+4. Copy toàn bộ nội dung bên trong thư mục giải nén vào C:\GitHub\GrainSpace, chọn Replace/ghi đè.
+5. Kiểm tra C:\GitHub\GrainSpace\.gitattributes: file phải tồn tại và rỗng (0 bytes). Điều này sẽ xóa các quy tắc Git LFS cũ.
+6. Mở Command Prompt tại thư mục GrainSpace và chạy:
+
+   git add -A
+   git status
+
+7. Kiểm tra danh sách thay đổi không có .env.local, mật khẩu, API key hoặc secret.
+8. Nếu commit trước đó là commit đầu tiên bạn tạo cho dự án và chưa Push được, chạy:
+
+   git commit --amend -m "Upload FILM SPACE source code"
+
+   Lệnh này thay commit cũ bằng commit mới, tránh giữ các con trỏ LFS trong commit đầu tiên. Nếu Git báo không có gì để commit hoặc lịch sử repository có commit từ người khác, dừng lại và hỏi hỗ trợ trước khi chạy lệnh khác.
+9. Mở GitHub Desktop và chọn Push origin.
+
+KHÔNG chạy `git config lfs.allowincompletepush true`: lệnh đó chỉ bỏ qua kiểm tra và không khôi phục ảnh.
+
+Nếu bạn muốn làm sạch hoàn toàn, cách khác là xóa thư mục local GrainSpace (chỉ sau khi chắc chắn không có thay đổi riêng cần giữ), clone repository mới vào thư mục trống, rồi copy bản ZIP mới vào đó và commit/push.
+
+Ảnh placeholder không phải ảnh gốc. Bảy ảnh thật có thể được thay lại sau này nếu tìm được bản sao.
